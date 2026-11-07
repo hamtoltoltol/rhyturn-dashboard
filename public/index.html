@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f9d55"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Rhyturn">
+<link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon.svg"><link rel="apple-touch-icon" href="/icon-192.png"><title>Rhyturn 관제</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<div class="top">
+  <div class="logo"><i>Rhy</i>turn</div>
+  <div class="sums" id="sums"></div>
+  <div class="sp"></div>
+  <span class="conn" id="conn">연결 중…</span>
+  <button class="btn sm" id="snd" title="경고음">🔔 경고음</button>
+  <button class="btn sm" id="setb">설정</button>
+  <button class="btn sm" id="out">로그아웃</button>
+</div>
+<div class="pop" id="pop">
+  <h4>부재 경고 기준 (분)</h4><div class="row"><input id="absMin" type="number" min="1" max="1440" style="width:90px"><button class="btn sm primary" id="saveSet">저장</button></div>
+  <h4>테마</h4><div class="row"><button class="btn sm" id="theme">라이트/다크 전환</button></div>
+  <div id="simTools"><h4>시연 도구 (시뮬레이션 호실)</h4>
+  <div class="row"><select id="simRoom"></select></div>
+  <div class="row"><button class="btn sm" data-sim="fall">낙상 발생</button><button class="btn sm" data-sim="absence">장시간 부재</button><button class="btn sm" data-sim="offline">오프라인 토글</button></div></div>
+</div>
+<div id="alerts"></div>
+<main>
+  <div class="bar"><h2>호실 현황</h2><span class="conn" id="cnt"></span><div class="sp"></div>
+    <span class="conn">전체 호실 적용</span><select id="allR"></select><button class="btn sm" id="allGo">적용</button></div>
+  <div class="grid" id="grid"></div>
+</main>
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+<script src="/app.js"></script>
+<script>if("serviceWorker"in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("/sw.js").catch(()=>{})</script></body></html>
