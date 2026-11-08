@@ -1,368 +1,895 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1f9d55"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Rhyturn">
-<title>Rhyturn 관제 (데모)</title><style>:root{--bg:#f2f7f3;--panel:#ffffff;--panel2:#eaf3ec;--line:#d3e3d7;--tx:#14261b;--mute:#5a7163;--acc:#1f9d55;--acc-tx:#ffffff;--acc-soft:#d9f0e1;--ok:#1f9d55;--warn:#b7791f;--bad:#d1363a;--off:#93a69a;--shadow:0 6px 20px rgba(24,70,40,.10)}
-:root[data-theme=dark]{--bg:#0e1612;--panel:#16211b;--panel2:#1d2c24;--line:#2b4034;--tx:#e6f2ea;--mute:#8fa898;--acc:#4ade80;--acc-tx:#06210f;--acc-soft:#1f4a31;--ok:#4ade80;--warn:#f5b73b;--bad:#ff6b6b;--off:#5f7367;--shadow:0 6px 24px rgba(0,0,0,.4)}
-*{box-sizing:border-box}
-html,body{margin:0;height:100%}
-body{background:var(--bg);color:var(--tx);font-family:"Pretendard","Noto Sans KR",system-ui,-apple-system,sans-serif;font-size:15px}
-button{font:inherit;color:inherit;cursor:pointer}
-.btn{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-weight:600;color:var(--tx)}
-.btn:hover{border-color:var(--acc)}
-.btn.primary{background:var(--acc);border-color:var(--acc);color:var(--acc-tx)}
-.btn.danger{background:var(--bad);border-color:var(--bad);color:#fff}
-.btn.sm{padding:6px 10px;font-size:13px;border-radius:8px}
-.btn.on{border-color:var(--acc);color:var(--acc);background:var(--acc-soft)}
-input,select{font:inherit;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:9px 10px}
-/* top bar */
-.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 20px;background:var(--panel);border-bottom:1px solid var(--line)}
-.logo{font-weight:800;font-size:19px;letter-spacing:.2px}.logo i{font-style:normal;color:var(--acc)}
-.sums{display:flex;gap:8px;flex-wrap:wrap}
-.chip{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:99px;background:var(--acc-soft);font-weight:600;font-size:13.5px}
-.chip b{font-size:16px}
-.dot{width:9px;height:9px;border-radius:50%;background:var(--off);display:inline-block}
-.dot.ok{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.bad{background:var(--bad)}
-.sp{flex:1}
-.conn{font-size:12.5px;color:var(--mute)}
-/* alerts */
-#alerts{position:sticky;top:57px;z-index:19}
-.alert{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 20px;background:var(--bad);color:#fff;font-weight:700;border-bottom:1px solid rgba(0,0,0,.2);animation:blink 1.2s infinite}
-.alert.acked{background:#8a3b3b;animation:none}
-.alert.absence{background:#b5790f}.alert.absence.acked{background:#6e5316}
-.alert .btn{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.5);color:#fff}
-.alert .ic{font-size:20px}
-@keyframes blink{50%{filter:brightness(1.25)}}
-/* grid */
-main{padding:20px;max-width:1500px;margin:0 auto}
-.bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
-.bar h2{margin:0;font-size:17px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
-.card{background:var(--panel);border:2px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;transition:transform .15s,border-color .15s;box-shadow:var(--shadow)}
-.card:hover{transform:translateY(-2px);border-color:var(--acc)}
-.card.alert-fall,.card.alert-absence{border-color:var(--bad);animation:pulse 1.3s infinite}
-.card.alert-absence{border-color:var(--warn)}
-.card.offline{opacity:.7}
-@keyframes pulse{50%{box-shadow:0 0 0 5px rgba(255,107,107,.3)}}
-.thumb{position:relative;aspect-ratio:4/3;background:#000}
-.thumb canvas,.thumb img{width:100%;height:100%;display:block;object-fit:cover}
-.thumb .tag{position:absolute;top:8px;left:8px;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700;background:rgba(0,0,0,.6);color:#fff}
-.thumb .tag.bad{background:var(--bad)}.thumb .tag.warn{background:var(--warn);color:#1a1200}
-.thumb .sim{position:absolute;top:8px;right:8px;font-size:11px;background:rgba(0,0,0,.55);color:#bbb;padding:2px 7px;border-radius:6px}
-.cbody{padding:11px 13px}
-.chead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.chead strong{font-size:18px}
-.st{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700}
-.kv{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;font-size:13px;color:var(--mute)}
-.kv b{display:block;color:var(--tx);font-size:15px}
-.bars{display:flex;gap:3px;height:6px;margin-top:10px}
-.bars i{flex:1;border-radius:3px;background:var(--line);position:relative;overflow:hidden}
-.bars i span{position:absolute;inset:0 auto 0 0;border-radius:3px}
-/* modal */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:24px 12px}
-.modal.open{display:flex}
-.sheet{background:var(--panel);border:1px solid var(--line);border-radius:16px;width:min(1100px,100%);box-shadow:var(--shadow)}
-.sheet header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
-.sheet header h3{margin:0;font-size:20px}
-.sbody{display:grid;gap:18px;padding:18px;grid-template-columns:1fr}
-@media(min-width:900px){.sbody{grid-template-columns:1.15fr 1fr}}
-.video{background:#000;border-radius:12px;overflow:hidden;aspect-ratio:4/3;position:relative}
-.video canvas,.video img{width:100%;height:100%;object-fit:contain;display:block}
-.video .msg{position:absolute;inset:0;display:none;align-items:center;justify-content:center;color:#9aa;font-weight:600;background:rgba(0,0,0,.7)}
-.video.dead .msg{display:flex}
-.sec{background:var(--panel2);border-radius:12px;padding:14px;margin-bottom:14px}
-.sec h4{margin:0 0 10px;font-size:13.5px;color:var(--mute);font-weight:700}
-.rg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.rg .btn{font-size:13px;padding:9px 6px;text-align:left}
-.rg .btn small{display:block;color:var(--mute);font-weight:500;font-size:11px}
-.rg .btn.active{background:var(--acc);color:var(--acc-tx);border-color:var(--acc)}.rg .btn.active small{color:var(--acc-tx);opacity:.8}
-.rg .btn.wide{grid-column:span 2;text-align:center}
-.sl{display:flex;align-items:center;gap:10px;margin:10px 0}
-.sl label{min-width:78px;font-size:13.5px;color:var(--mute)}.sl input{flex:1;accent-color:var(--acc)}.sl .v{min-width:44px;text-align:right;font-family:ui-monospace,monospace}
-.cct{height:8px;border-radius:4px;background:linear-gradient(90deg,#ffb35c,#fff2dd,#cfe4ff);margin:-4px 0 6px 88px}
-canvas.chart{width:100%;height:110px;display:block}
-.log{max-height:150px;overflow:auto;font-size:13px;line-height:1.8;color:var(--mute)}
-.log b{color:var(--tx);font-weight:600}
-details summary{cursor:pointer;font-size:13px;color:var(--mute);font-weight:700}
-.lat{font-size:12px;color:var(--mute);margin-top:6px}
-/* settings drop */
-.pop{position:absolute;right:20px;top:58px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;width:300px;box-shadow:var(--shadow);display:none;z-index:40}
-.pop.open{display:block}.pop h4{margin:0 0 8px;font-size:13px;color:var(--mute)}
-.pop .row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
-.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:9px 16px;border-radius:10px;font-size:14px;display:none;z-index:99}
-/* login */
-.lw{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px}
-.lc{width:min(380px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:28px;box-shadow:var(--shadow)}
-.lc h1{margin:0 0 4px;font-size:24px}.lc p{margin:0 0 20px;color:var(--mute);font-size:14px}
-.lc label{display:block;font-size:13px;color:var(--mute);margin:12px 0 5px}.lc input{width:100%}.lc .btn{width:100%;margin-top:18px;padding:12px}
-.err{color:var(--bad);font-size:13.5px;margin-top:10px;min-height:18px}
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2f855a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Rhyturn">
 
-/* ===== 태블릿 최적화 (기준: 10인치 1280x800 가로, 800x1280 세로, iPad 1024x768 / 1180x820) ===== */
-html,body{height:100%;overscroll-behavior:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-text-size-adjust:100%;user-select:none;-webkit-user-select:none}
-body{display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-.top{position:relative;top:auto;flex:none}
-#alerts{position:relative;top:auto;flex:none;max-height:30vh;overflow:auto}
-main{flex:1;min-height:0;overflow:auto;width:100%;max-width:none;padding:14px 18px 18px;-webkit-overflow-scrolling:touch}
-.btn,.btn.sm{min-height:44px}
-.btn.sm{padding:8px 14px;font-size:14px}
-select,input{min-height:44px}
-.alert .btn{min-height:44px}
-input[type=range]{-webkit-appearance:none;appearance:none;height:8px;border-radius:4px;background:var(--line);min-height:0;padding:0;border:0}
+<title>Rhyturn 관제 (데모)</title><style>/* Rhyturn 디자인 토큰 — 알람 6등급 색상은 설계서 §4 (색은 '상태'만 표현, 구역·층은 색으로 구분하지 않음) */
+:root{--bg:#f2f6f3;--panel:#fff;--panel2:#eaf2ec;--line:#d3e0d7;--tx:#14261b;--mute:#566b5d;--acc:#2f855a;--acc-tx:#fff;--acc-soft:#dcefe3;--cam:#FAF4C0;--cam-tx:#7a5c00;--shadow:0 4px 16px rgba(24,70,40,.10);
+--l4:#C62A31;--l3:#A8570A;--l2:#0A6E86;--l1:#1B7A4D;--l0:#56646F;--sys:#6D3FBF}
+:root[data-theme=dark]{--bg:#0d1511;--panel:#16211b;--panel2:#1d2c24;--line:#2b4034;--tx:#e6f2ea;--mute:#93aa9b;--acc:#4ade80;--acc-tx:#06210f;--acc-soft:#1f4a31;--cam:#3a3714;--cam-tx:#f1e58a;--shadow:0 4px 18px rgba(0,0,0,.45);
+--l4:#FF6B6F;--l3:#FFB259;--l2:#4FD0E8;--l1:#4ED08A;--l0:#8B99A6;--sys:#B794F6}
+.lv-L4{--lv:var(--l4)}.lv-L3{--lv:var(--l3)}.lv-L2{--lv:var(--l2)}.lv-L1{--lv:var(--l1)}.lv-L0{--lv:var(--l0)}.lv-SYS{--lv:var(--sys)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overscroll-behavior:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--tx);font-family:"Pretendard","Noto Sans KR",system-ui,-apple-system,sans-serif;font-size:15px;display:grid;grid-template-columns:92px 1fr;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button{font:inherit;color:inherit;cursor:pointer}
+input,select{font:inherit;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:9px 10px;min-height:48px}
+.btn{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 16px;min-height:48px;font-weight:700}
+.btn:hover{border-color:var(--acc)}.btn.primary{background:var(--acc);border-color:var(--acc);color:var(--acc-tx)}
+.btn.sm{min-height:44px;padding:8px 14px;font-size:14px}.btn.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc)}
+.btn.warn{background:var(--panel);border-color:var(--l3);color:var(--l3)}
+/* 좌측 레일 */
+.rail{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;z-index:30}
+.rail .logo{font-weight:800;font-size:15px;margin-bottom:10px;text-align:center;line-height:1.1}.rail .logo i{font-style:normal;color:var(--acc)}
+.nav{position:relative;width:78px;min-height:64px;border:0;border-radius:14px;background:none;color:var(--mute);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12.5px;font-weight:700}
+.nav b{font-size:22px;line-height:1;font-weight:400}.nav.act{background:var(--acc-soft);color:var(--acc)}
+.nav .bd{position:absolute;top:4px;right:8px;min-width:22px;height:22px;border-radius:11px;background:var(--l4);color:#fff;font-size:12px;display:none;align-items:center;justify-content:center;padding:0 5px;font-weight:800}
+.rail .sp{flex:1}
+/* 본문 */
+.stage{display:flex;flex-direction:column;min-width:0;min-height:0;height:100%}
+.top{flex:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 18px;background:var(--panel);border-bottom:1px solid var(--line)}
+.top h1{margin:0;font-size:18px}.top .sub{color:var(--mute);font-size:13px}
+.sp{flex:1}.conn{font-size:12.5px;color:var(--mute)}
+#banner{flex:none;max-height:32vh;overflow:auto}
+.ban{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 18px;color:#fff;font-weight:800;background:var(--l4);border-bottom:1px solid rgba(0,0,0,.2)}
+.ban.L3{background:var(--l3)}.ban.L4.NEW{animation:pulse 1.1s infinite}.ban.ack{filter:saturate(.6) brightness(.85)}
+:root[data-theme=dark] .ban{color:#14090a}
+.ban .btn{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.6);color:inherit;min-height:44px}
+@keyframes pulse{50%{filter:brightness(1.3)}}
+main{flex:1;min-height:0;overflow:auto;padding:14px 18px 22px;-webkit-overflow-scrolling:touch}
+h2.sec{margin:18px 0 10px;font-size:15px;color:var(--mute);display:flex;align-items:center;gap:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:99px;background:var(--panel);border:1px solid var(--line);font-weight:700;font-size:13.5px}
+.chip .g{color:var(--lv)}.chip b{font-size:16px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}.seg .btn{padding:8px 14px}
+.tag{font-size:11.5px;padding:2px 8px;border-radius:99px;background:var(--panel2);color:var(--mute);font-weight:700}
+/* 호실 타일: 좌측 바(6/4/3/2px) + 도형 + 문구 = 3중 인코딩 */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(min-width:900px) and (orientation:landscape){.grid{grid-template-columns:repeat(5,1fr)}}
+@media(max-width:600px){.grid{grid-template-columns:repeat(2,1fr)}}
+.tile{position:relative;text-align:left;background:color-mix(in srgb,var(--lv) 6%,var(--panel));border:1px solid var(--line);border-left:var(--bar,2px) solid var(--lv);border-radius:12px;overflow:hidden;padding:0;box-shadow:var(--shadow)}
+.tile.dash{border-left-style:dashed}
+.tile .cam{aspect-ratio:2/1;background:var(--cam);display:flex;align-items:center;justify-content:center;color:var(--cam-tx);font-weight:800;font-size:30px;position:relative}
+.tile .cam img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tile .cam small{position:absolute;left:8px;bottom:5px;font-size:11px;font-weight:600;opacity:.7}
+.tile .sysb{position:absolute;top:6px;right:6px;background:var(--sys);color:#fff;border-radius:8px;padding:2px 8px;font-size:12px;font-weight:800;z-index:2}
+.tile .body{padding:8px 11px 10px}
+.tile .st{display:flex;align-items:center;justify-content:space-between;font-weight:800}
+.tile .st .nm{font-size:17px}.tile .st .lvl{color:var(--lv);font-size:13px;white-space:nowrap}
+.tile .kv{display:flex;gap:10px;margin-top:4px;font-size:12.5px;color:var(--mute);flex-wrap:wrap}.tile .kv b{color:var(--tx)}.tile .kv span:last-child{flex-basis:100%}
+.tile:active{transform:scale(.99)}
+.tile.off{opacity:.75}
+/* 호실 상세 / 목록 공통 */
+.cols{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:900px) and (orientation:landscape){.cols{grid-template-columns:1.1fr 1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+.card h3{margin:0 0 10px;font-size:14px;color:var(--mute)}
+.video{background:var(--cam);border-radius:12px;overflow:hidden;aspect-ratio:4/3;position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--cam-tx);max-height:52vh;width:100%}
+.video .big{font-size:64px;font-weight:800}.video img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.video.dead::after{content:"영상 없음 · 유닛 오프라인";position:absolute;inset:0;background:rgba(40,40,40,.78);color:#ddd;display:flex;align-items:center;justify-content:center;font-weight:700}
+.back{margin-bottom:10px}
+.alert-card{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;background:color-mix(in srgb,var(--lv) 7%,var(--panel));border:1px solid var(--line);border-left:var(--bar) solid var(--lv);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.alert-card .t{font-weight:800;font-size:16px}.alert-card .t .g{color:var(--lv)}.alert-card .m{color:var(--mute);font-size:13px;margin-top:2px}
+.alert-card .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.flow{display:flex;gap:4px;margin-top:8px;grid-column:1/-1;font-size:11.5px;color:var(--mute);flex-wrap:wrap}
+.flow span{padding:2px 8px;border-radius:99px;background:var(--panel2)}.flow span.on{background:var(--lv);color:#fff;font-weight:800}
+:root[data-theme=dark] .flow span.on{color:#101010}
+.esc{color:var(--l4);font-weight:800}
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:6px}.rg .btn{text-align:left;min-height:52px;font-size:13.5px}.rg .btn small{display:block;color:var(--mute);font-weight:500;font-size:11px}
+.rg .btn.active{background:var(--acc);color:var(--acc-tx);border-color:var(--acc)}.rg .btn.active small{color:var(--acc-tx);opacity:.8}.rg .wide{grid-column:span 2;text-align:center}
+.sl{display:flex;align-items:center;gap:10px;margin:12px 0}.sl label{min-width:84px;font-size:13.5px;color:var(--mute)}.sl input{flex:1;padding:0;min-height:0;accent-color:var(--acc)}.sl .v{min-width:44px;text-align:right;font-family:ui-monospace,monospace}
+input[type=range]{-webkit-appearance:none;appearance:none;height:8px;border-radius:4px;background:var(--line);border:0}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:var(--acc);border:3px solid var(--panel);box-shadow:0 1px 5px rgba(0,0,0,.35)}
-input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--acc);border:3px solid var(--panel)}
-.sl{margin:14px 0}
-.grid{grid-template-columns:repeat(3,1fr);gap:12px}
-.pop{top:62px;max-height:calc(100% - 80px);overflow:auto}
-@media(min-width:900px) and (orientation:landscape){
-  .grid{grid-template-columns:repeat(5,1fr);gap:12px}
-  .thumb{aspect-ratio:16/10}
-  .cbody{padding:9px 12px}
-  .chead{margin-bottom:5px}
-  .kv{gap:3px 8px;font-size:12px}.kv b{font-size:14px}
-  .bars{margin-top:7px}
-}
-@media(min-width:600px) and (max-width:899px),(orientation:portrait){ .grid{grid-template-columns:repeat(3,1fr)} }
-@media(max-width:599px){ .grid{grid-template-columns:repeat(2,1fr)} .top{padding:10px 12px} }
-/* 호실 상세: 태블릿에서는 전체 화면 시트 */
-@media(max-width:1500px){
-  .modal{padding:0;align-items:stretch;overflow:hidden}
-  .sheet{width:100%;height:100%;border-radius:0;border:0;display:flex;flex-direction:column;overflow:hidden}
-  .sheet header{flex:none;padding:12px 18px}
-  .sheet header .btn{min-height:48px;min-width:96px;font-size:16px}
-  .sbody{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
-}
-@media(min-width:900px) and (orientation:landscape){
-  .sbody{grid-template-columns:1.1fr 1fr;overflow:hidden}
-  .sbody>div{overflow:auto;min-height:0}
-}
-.rg .btn{min-height:52px}
-@media(hover:none){.card:hover{transform:none;border-color:var(--line)}.card:active{transform:scale(.99)}}
-@media(display-mode:standalone),(display-mode:fullscreen){.top{padding-top:10px}}
-@media(orientation:portrait){.video{aspect-ratio:auto;height:34vh;min-height:220px}}
+canvas.chart{width:100%;height:110px;display:block}
+.log{font-size:13px;line-height:1.85;color:var(--mute);max-height:230px;overflow:auto}.log b{color:var(--tx);font-weight:600}
+table.t{width:100%;border-collapse:collapse;font-size:13.5px}.t th{text-align:left;color:var(--mute);font-weight:700;padding:8px 6px;border-bottom:1px solid var(--line)}.t td{padding:9px 6px;border-bottom:1px solid var(--line)}
+.t .g{color:var(--lv);font-weight:800}
+.set{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.set:last-child{border:0}.set small{display:block;color:var(--mute)}
+.empty{color:var(--mute);padding:20px;text-align:center}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;display:none;z-index:99}
+/* 세로 화면: 레일을 하단바로 */
+@media(orientation:portrait){body{grid-template-columns:1fr;grid-template-rows:1fr auto;height:100%}
+ .rail{order:2;flex-direction:row;justify-content:space-around;border-right:0;border-top:1px solid var(--line);padding:4px}.rail .logo,.rail .sp{display:none}.nav{width:auto;flex:1;min-height:58px}
+ .video{max-height:34vh}}
+@media(hover:none){.btn:hover{border-color:var(--line)}}
+/* 로그인 */
+.lw{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;grid-column:1/-1}
+.lc{width:min(380px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:28px;box-shadow:var(--shadow)}
+.lc h1{margin:0 0 4px;font-size:24px}.lc p{margin:0 0 20px;color:var(--mute);font-size:14px}.lc label{display:block;font-size:13px;color:var(--mute);margin:12px 0 5px}.lc input{width:100%}.lc .btn{width:100%;margin-top:18px}
+.err{color:var(--l4);font-size:13.5px;margin-top:10px;min-height:18px}
 </style></head>
 <body>
-<div class="top">
+<nav class="rail" id="rail">
   <div class="logo"><i>Rhy</i>turn</div>
-  <div class="sums" id="sums"></div>
+  <button class="nav" data-go="/"><b>▦</b>현황<span class="bd" data-bd="board"></span></button>
+  <button class="nav" data-go="/alerts"><b>🔔</b>알람<span class="bd" data-bd="alerts"></span></button>
+  <button class="nav" data-go="/system"><b>▣</b>시스템<span class="bd" data-bd="sys" style="background:var(--sys)"></span></button>
+  <button class="nav" data-go="/log"><b>≣</b>로그</button>
   <div class="sp"></div>
-  <span class="conn" id="conn">연결 중…</span>
-  <button class="btn sm" id="snd" title="경고음">🔔 경고음</button>
-  <button class="btn sm" id="setb">설정</button>
-  <button class="btn sm" id="out">로그아웃</button>
+  <button class="nav" data-go="/settings"><b>⚙</b>설정</button>
+</nav>
+<div class="stage">
+  <header class="top"><h1 id="fname">가온요양원</h1><span class="sub" id="clock"></span><span class="sp"></span><span class="conn" id="conn">연결 중…</span></header>
+  <div id="banner"></div>
+  <main id="view"></main>
 </div>
-<div class="pop" id="pop">
-  <h4>부재 경고 기준 (분)</h4><div class="row"><input id="absMin" type="number" min="1" max="1440" style="width:90px"><button class="btn sm primary" id="saveSet">저장</button></div>
-  <h4>테마</h4><div class="row"><button class="btn sm" id="theme">라이트/다크 전환</button></div>
-  <div id="simTools"><h4>시연 도구 (시뮬레이션 호실)</h4>
-  <div class="row"><select id="simRoom"></select></div>
-  <div class="row"><button class="btn sm" data-sim="fall">낙상 발생</button><button class="btn sm" data-sim="absence">장시간 부재</button><button class="btn sm" data-sim="offline">오프라인 토글</button></div></div>
-</div>
-<div id="alerts"></div>
-<main>
-  <div class="bar"><h2>호실 현황</h2><span class="conn" id="cnt"></span><div class="sp"></div>
-    <span class="conn">전체 호실 적용</span><select id="allR"></select><button class="btn sm" id="allGo">적용</button></div>
-  <div class="grid" id="grid"></div>
-</main>
-<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast"></div>
-<script>// 브라우저 안에서 동작하는 데모용 시뮬레이터 (서버/ESP32 없이 화면·기능 확인용)
+<script>window.DEMO_FACILITY={
+ "_comment": "공간 마스터(facility.json). 호실·침상·면적을 코드에 하드코딩하지 않는다. 확정 필요: 호실별 침상 수, 실면적, 입소자 프로파일, 복도 실측 길이, 2층 실제 호실 번호(assumed:true)",
+ "facility": "GAON",
+ "name": "가온요양원",
+ "zones": [
+  {
+   "id": "A",
+   "floor": "3F",
+   "name": "3층 구관",
+   "assumed": false,
+   "poc": false,
+   "rooms": [
+    "301",
+    "302",
+    "303",
+    "304",
+    "305",
+    "306",
+    "307"
+   ]
+  },
+  {
+   "id": "B",
+   "floor": "3F",
+   "name": "3층 신관",
+   "assumed": false,
+   "poc": true,
+   "rooms": [
+    "308",
+    "309",
+    "310",
+    "311"
+   ]
+  },
+  {
+   "id": "C",
+   "floor": "2F",
+   "name": "2층 구관",
+   "assumed": true,
+   "poc": false,
+   "rooms": [
+    "201",
+    "202",
+    "203",
+    "204",
+    "205",
+    "206",
+    "207"
+   ]
+  },
+  {
+   "id": "D",
+   "floor": "2F",
+   "name": "2층 신관",
+   "assumed": true,
+   "poc": false,
+   "rooms": [
+    "208",
+    "209",
+    "210",
+    "211"
+   ]
+  }
+ ],
+ "rooms": [
+  {
+   "id": "301",
+   "name": "301호",
+   "floor": "3F",
+   "zone": "A",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-A-R301-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "302",
+   "name": "302호",
+   "floor": "3F",
+   "zone": "A",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-A-R302-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "303",
+   "name": "303호",
+   "floor": "3F",
+   "zone": "A",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-A-R303-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "304",
+   "name": "304호",
+   "floor": "3F",
+   "zone": "A",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-A-R304-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "305",
+   "name": "305호",
+   "floor": "3F",
+   "zone": "A",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-A-R305-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "306",
+   "name": "306호",
+   "floor": "3F",
+   "zone": "A",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-A-R306-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "307",
+   "name": "307호",
+   "floor": "3F",
+   "zone": "A",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-A-R307-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "308",
+   "name": "308호",
+   "floor": "3F",
+   "zone": "B",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-B-R308-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "309",
+   "name": "309호",
+   "floor": "3F",
+   "zone": "B",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-B-R309-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "310",
+   "name": "310호",
+   "floor": "3F",
+   "zone": "B",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-B-R310-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "311",
+   "name": "311호",
+   "floor": "3F",
+   "zone": "B",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-B-R311-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "201",
+   "name": "201호",
+   "floor": "2F",
+   "zone": "C",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-C-R201-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "202",
+   "name": "202호",
+   "floor": "2F",
+   "zone": "C",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-C-R202-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "203",
+   "name": "203호",
+   "floor": "2F",
+   "zone": "C",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-C-R203-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "204",
+   "name": "204호",
+   "floor": "2F",
+   "zone": "C",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-C-R204-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "205",
+   "name": "205호",
+   "floor": "2F",
+   "zone": "C",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-C-R205-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "206",
+   "name": "206호",
+   "floor": "2F",
+   "zone": "C",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-C-R206-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "207",
+   "name": "207호",
+   "floor": "2F",
+   "zone": "C",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-C-R207-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "208",
+   "name": "208호",
+   "floor": "2F",
+   "zone": "D",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-D-R208-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "209",
+   "name": "209호",
+   "floor": "2F",
+   "zone": "D",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-D-R209-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "210",
+   "name": "210호",
+   "floor": "2F",
+   "zone": "D",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-D-R210-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "211",
+   "name": "211호",
+   "floor": "2F",
+   "zone": "D",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-D-R211-U01"
+   ],
+   "assumed": true
+  }
+ ]
+}</script>
+<script>// Rhyturn 판정/알람 엔진 — 브라우저(데모)와 Node(서버)에서 동일하게 동작 (설계서 §3~§4)
+// RAW → FEATURE → STATE → EVENT → 합의 게이트 → ALERT. 이 MVP는 카메라·조도·장치 상태 기반 규칙만 구현한다.
+(function (root) {
+  // 알람 등급 6단계 (packages/tokens/status.ts 대응): 색은 상태만 표현, 도형·좌측바·문구로 3중 인코딩
+  const LEVELS = {
+    L4: { rank: 4, glyph: '▲', name: '긴급', en: 'CRITICAL', bar: 6 },
+    L3: { rank: 3, glyph: '●', name: '주의', en: 'WARNING', bar: 4 },
+    L2: { rank: 2, glyph: '◆', name: '관찰', en: 'WATCH', bar: 3 },
+    L1: { rank: 1, glyph: '▬', name: '안정', en: 'NORMAL', bar: 2 },
+    L0: { rank: 0, glyph: '○', name: '부재', en: 'ABSENT', bar: 2 },
+    SYS: { rank: -1, glyph: '▣', name: '점검', en: 'FAULT', bar: 3 },
+  };
+  // 케어 이벤트 (설계서 §3). 이 MVP 구현 범위: E-01(장시간 부재), E-02, E-03, E-07
+  const EVENTS = {
+    'E-01': { level: 'L3', title: '침대 이탈·장시간 부재' },
+    'E-02': { level: 'L4', title: '낙상 의심' },
+    'E-03': { level: 'L3', title: '장시간 무동작' },
+    'E-07': { level: 'L2', title: '야간 각성' },
+  };
+  const ACTIVE = ['NEW', 'ACKNOWLEDGED', 'DISPATCHED'];
+  const NEXT = { // 알람 상태 흐름: NEW → ACKNOWLEDGED → DISPATCHED → RESOLVED → HANDED_OVER, 분기 FALSE_ALARM
+    ack: { from: ['NEW'], to: 'ACKNOWLEDGED' },
+    dispatch: { from: ['NEW', 'ACKNOWLEDGED'], to: 'DISPATCHED' },
+    resolve: { from: ['NEW', 'ACKNOWLEDGED', 'DISPATCHED'], to: 'RESOLVED' },
+    'false-alarm': { from: ['NEW', 'ACKNOWLEDGED', 'DISPATCHED'], to: 'FALSE_ALARM' },
+  };
+  const RHYTHMS = [
+    ['기상 유도', 'Dawn', [22, 24, 4, 26]], ['아침 각성', 'Morning', [76, 23, 27, 26]], ['주간 피크', 'Daytime', [132, 33, 61, 28]],
+    ['정오', 'Midday', [106, 26, 49, 22]], ['오후 활동', 'Afternoon', [89, 26, 32, 30]], ['일몰 전환', 'Wind-down', [51, 31, 12, 31]],
+    ['저녁', 'Evening', [26, 23, 6, 23]], ['취침 준비', 'Pre-sleep', [11, 13, 2, 13]], ['야간 수면', 'Night', [1, 1, 0, 1]], ['야간 이동', 'Night nav', [1, 5, 0, 5]],
+  ].map(([name, en, ch]) => ({ name, en, ch })); // ch: D0 Green, D1 Yellow, D2 Blue, D3 Red
+  const COOLDOWN_MS = 180e3, ESCALATE_MS = 180e3, OFFLINE_MS = 15e3, L2_AUTOCLOSE_MS = 300e3;
+
+  function createEngine(facility, opts = {}) {
+    const SIM = opts.sim !== false;
+    let settings = { absenceMinutes: 30, shadowMode: false, soundOn: true, ...(opts.settings || {}) };
+    const rooms = new Map(), alerts = [], transitions = [], events = [], faults = [];
+    const target = new Map(), lastRaised = new Map();
+    let aseq = 0, fseq = 0, onChange = () => {};
+    const now = () => Date.now();
+    const changed = () => onChange();
+
+    const initR = [2, 2, 3, 2, 1, 4, 2, 8, 2, 5, 3];
+    const lux = (r) => Math.max(0, Math.round((r.ch[0] * .9 + r.ch[1] * .6 + r.ch[2] * .5 + r.ch[3] * .3) * 1.1 + (Math.random() - .5) * 4));
+    facility.rooms.forEach((fr, i) => {
+      const rh = initR[i % initR.length];
+      const r = { id: fr.id, name: fr.name, floor: fr.floor, zone: fr.zone, unitId: fr.units[0], beds: fr.beds, mode: 'sim', online: SIM, present: SIM,
+        absentSince: null, lastSeen: now(), rhythm: rh, ch: [...RHYTHMS[rh].ch], lux: 0, luxHist: [], fps: 0, rssi: null, fw: null, fall: false, lastMotion: now() };
+      r.lux = lux(r); for (let k = 0; k < 40; k++) r.luxHist.push(r.lux + Math.round((Math.random() - .5) * 6));
+      rooms.set(r.id, r);
+    });
+
+    function addEvent(room, type, msg, extra) { const e = { t: now(), room, type, msg, ...extra }; events.unshift(e); if (events.length > 300) events.length = 300; changed(); return e; }
+    function transition(a, state, actor) { a.state = state; const tr = { alertId: a.id, room: a.room, state, actor, t: now() }; a.transitions.push(tr); transitions.unshift(tr); if (transitions.length > 500) transitions.length = 500; }
+    const roomName = (id) => rooms.get(id)?.name || id;
+
+    function raise(room, code, extra = {}) {
+      const def = EVENTS[code], key = room.id + code;
+      if (now() - (lastRaised.get(key) || 0) < COOLDOWN_MS) return null;                  // 쿨다운 180초
+      lastRaised.set(key, now());
+      if (settings.shadowMode) { addEvent(room.id, 'shadow', `[Shadow] ${room.name} ${def.title} (알림 미발송, 로그만 기록)`, { code, level: def.level }); return null; }
+      const a = { id: 'A-' + String(++aseq).padStart(4, '0'), room: room.id, code, level: def.level, title: def.title, created: now(), escalated: false, state: 'NEW', transitions: [], ...extra };
+      transition(a, 'NEW', 'system'); alerts.unshift(a);
+      addEvent(room.id, 'alert', `${room.name} ${code} ${def.title} (${def.level})`, { alertId: a.id, level: def.level });
+      return a;
+    }
+    function act(id, action, actor = 'admin') {
+      const a = alerts.find((x) => x.id === id), rule = NEXT[action];
+      if (!a || !rule || !rule.from.includes(a.state)) return { error: '허용되지 않는 상태 전이' };
+      if (action === 'dispatch' && a.state === 'NEW') transition(a, 'ACKNOWLEDGED', actor);
+      transition(a, rule.to, actor);
+      if (rule.to === 'RESOLVED' || rule.to === 'FALSE_ALARM') { const r = rooms.get(a.room); if (a.code === 'E-02' && r) r.fall = false; }
+      addEvent(a.room, 'alert', `${roomName(a.room)} ${a.title} → ${rule.to}`, { alertId: a.id }); return { ok: true };
+    }
+    function handover(actor = 'admin') { let n = 0; alerts.forEach((a) => { if (a.state === 'RESOLVED') { transition(a, 'HANDED_OVER', actor); n++; } }); if (n) addEvent('all', 'info', `근무 인계: 해소 알람 ${n}건 인계`); return { ok: true, count: n }; }
+
+    function setOnline(r, on, why) {
+      if (r.online === on) return; r.online = on; r.lastSeen = now();
+      if (!on) { faults.unshift({ id: 'F-' + String(++fseq).padStart(3, '0'), code: 'S-01', room: r.id, title: '유닛 오프라인', opened: now(), closed: null }); addEvent(r.id, 'fault', `${r.name} S-01 유닛 오프라인${why ? ' (' + why + ')' : ''}`); }
+      else { const f = faults.find((x) => x.room === r.id && !x.closed); if (f) f.closed = now(); addEvent(r.id, 'info', `${r.name} 유닛 연결됨`); }
+    }
+    function setPresent(r, p) {
+      r.present = p;
+      if (p) { r.absentSince = null; r.lastMotion = now(); } else if (!r.absentSince) r.absentSince = now();
+    }
+
+    // 장치(ESP32)에서 들어오는 값
+    function devicePatch(id, p) {
+      const r = rooms.get(id); if (!r) return; r.mode = 'device'; r.lastSeen = now();
+      if (Array.isArray(p.ch)) r.ch = p.ch; if (p.rhythm !== undefined) r.rhythm = p.rhythm;
+      if (typeof p.lux === 'number') r.lux = p.lux; if (p.fps !== undefined) r.fps = p.fps; if (p.rssi !== undefined) r.rssi = p.rssi; if (p.fw) r.fw = p.fw;
+      if (!r.online) { setOnline(r, true); if (r.present === false && !r.absentSince) setPresent(r, true); }
+    }
+    function vision(id, v) { const r = rooms.get(id); if (!r) return; setPresent(r, !!v.present); if (v.fall) { r.fall = true; raise(r, 'E-02'); } }
+
+    // 조명 제어: 시뮬레이션 호실은 즉시 반영, 장치 호실은 전송할 메시지를 반환
+    function control(id, cmd) {
+      const r = rooms.get(id); if (!r) return { error: 'no room' };
+      let msg;
+      if (cmd.type === 'rhythm') {
+        if (!(cmd.id >= -1 && cmd.id <= 9)) return { error: 'bad id' };
+        r.rhythm = cmd.id; target.set(id, cmd.id < 0 ? [0, 0, 0, 0] : [...RHYTHMS[cmd.id].ch]); msg = { type: 'rhythm', id: cmd.id };
+        addEvent(id, 'control', `${r.name} 조명: ${cmd.id < 0 ? '소등' : RHYTHMS[cmd.id].name}`);
+      } else if (cmd.type === 'set') {
+        if (!(cmd.ch >= 0 && cmd.ch <= 3 && cmd.val >= 0 && cmd.val <= 255)) return { error: 'bad' };
+        r.rhythm = -2; const t = target.get(id) || [...r.ch]; t[cmd.ch] = cmd.val; target.set(id, t); msg = { type: 'set', ch: cmd.ch, val: cmd.val };
+      } else return { error: 'bad cmd' };
+      changed(); return { ok: true, device: r.mode === 'device', msg };
+    }
+
+    // 데모/시험용 이벤트 주입
+    function simEvent(id, type) {
+      const r = rooms.get(id); if (!r) return { error: 'no room' };
+      if (type === 'fall') { r.fall = true; setPresent(r, true); raise(r, 'E-02'); }
+      else if (type === 'absence') { setPresent(r, false); r.absentSince = now() - settings.absenceMinutes * 60e3 - 1000; }
+      else if (type === 'nomotion') { setPresent(r, true); r.still = true; r.lastMotion = now() - 6 * 60e3; }
+      else if (type === 'watch') raise(r, 'E-07');
+      else if (type === 'offline') { setOnline(r, !r.online, '시험'); }
+      changed(); return { ok: true };
+    }
+
+    function tick() {
+      const t = now();
+      rooms.forEach((r) => {
+        if (r.mode === 'device' && r.online && t - r.lastSeen > OFFLINE_MS) setOnline(r, false, '응답 없음');
+        if (r.mode === 'sim' && r.online) {
+          r.lastSeen = t;
+          const tg = target.get(r.id); if (tg) for (let i = 0; i < 4; i++) { const d = tg[i] - r.ch[i]; r.ch[i] += Math.sign(d) * Math.min(Math.abs(d), 12); }
+          r.lux = lux(r); r.fps = 8 + Math.round(Math.random() * 2); r.rssi = -50 - Math.round(Math.random() * 15);
+          if (r.present && !r.still) r.lastMotion = t;
+          if (SIM && !r.fall) {
+            if (r.present && Math.random() < .0008) setPresent(r, false);
+            else if (!r.present && Math.random() < .03 && t - r.absentSince < 3 * 60e3) setPresent(r, true);
+            if (r.present && Math.random() < .0004) raise(r, 'E-07');
+          }
+        }
+        if (r.online && !r.present && r.absentSince && t - r.absentSince > settings.absenceMinutes * 60e3) raise(r, 'E-01');
+        if (r.online && r.present && t - r.lastMotion > 5 * 60e3 && r.mode === 'sim') { raise(r, 'E-03'); r.still = false; r.lastMotion = t; }
+      });
+      alerts.forEach((a) => {
+        if (a.level === 'L4' && a.state === 'NEW' && !a.escalated && t - a.created > ESCALATE_MS) { a.escalated = true; a.transitions.push({ alertId: a.id, room: a.room, state: 'ESCALATED', actor: 'system', t }); transitions.unshift(a.transitions[a.transitions.length - 1]); addEvent(a.room, 'alert', `${roomName(a.room)} ${a.title} 3분 미확인 → 에스컬레이션`, { alertId: a.id }); }
+        if (a.level === 'L2' && ACTIVE.includes(a.state) && t - a.created > L2_AUTOCLOSE_MS) transition(a, 'RESOLVED', 'system');
+      });
+    }
+    let tickN = 0;
+    function trackHist() { rooms.forEach((r) => { r.luxHist.push(r.lux); if (r.luxHist.length > 90) r.luxHist.shift(); }); }
+
+    function snapshot() {
+      const act_ = alerts.filter((a) => ACTIVE.includes(a.state)), recent = alerts.filter((a) => !ACTIVE.includes(a.state)).slice(0, 40);
+      return { type: 'state', t: now(), settings, alerts: [...act_, ...recent].map((a) => ({ ...a, transitions: undefined, last: a.transitions[a.transitions.length - 1] })),
+        faults: faults.slice(0, 40), rooms: [...rooms.values()].map((r) => ({ ...r, ch: r.ch.map(Math.round), luxHist: r.luxHist.slice(-60) })) };
+    }
+    return { rooms, snapshot, tick, trackHist, act, handover, devicePatch, vision, control, simEvent, raise,
+      log: () => ({ transitions: transitions.slice(0, 150), events: events.slice(0, 150) }),
+      getSettings: () => settings, setSettings: (s) => { settings = { absenceMinutes: Math.min(1440, Math.max(1, +s.absenceMinutes || 30)), shadowMode: !!s.shadowMode, soundOn: !!s.soundOn }; changed(); return settings; },
+      onChange: (f) => (onChange = f), setOnline, addEvent, sim: SIM };
+  }
+  const api = { createEngine, LEVELS, EVENTS, RHYTHMS, ACTIVE };
+  if (typeof module !== 'undefined') module.exports = api; else root.RhyEngine = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>// 데모용 전송 계층: 서버 없이 브라우저 안에서 engine.js를 직접 구동 (화면·기능 확인용)
 window.DEMO = (() => {
-  const RH = [['기상 유도','Dawn',[22,24,4,26]],['아침 각성','Morning',[76,23,27,26]],['주간 피크','Daytime',[132,33,61,28]],['정오','Midday',[106,26,49,22]],['오후 활동','Afternoon',[89,26,32,30]],['일몰 전환','Wind-down',[51,31,12,31]],['저녁','Evening',[26,23,6,23]],['취침 준비','Pre-sleep',[11,13,2,13]],['야간 수면','Night',[1,1,0,1]],['야간 이동','Night nav',[1,5,0,5]]];
-  const RHYTHMS = RH.map(([name, en, ch]) => ({ name, en, ch }));
-  let settings = { absenceMinutes: 30, soundOn: true }, events = [], cb = () => {};
-  const rooms = [], target = {};
-  const init = [2, 2, 3, 2, 1, 4, 2, 8, 2, 5];
-  const lux = (r) => Math.max(0, Math.round((r.ch[0]*.9 + r.ch[1]*.6 + r.ch[2]*.5 + r.ch[3]*.3) * 1.1 + (Math.random() - .5) * 4));
-  for (let i = 1; i <= 10; i++) { const r = { id: String(100 + i), name: (100 + i) + '호', mode: 'sim', online: true, rhythm: init[i-1], ch: [...RHYTHMS[init[i-1]].ch], luxHist: [], present: true, absentSince: null, fps: 9, rssi: -55, alert: null, fallPose: false, lastSeen: Date.now() }; r.lux = lux(r); rooms.push(r); }
-  rooms[6].online = false;
-  const get = (id) => rooms.find((r) => r.id === id);
-  const ev = (room, type, msg) => { const e = { t: Date.now(), room, type, msg }; events.unshift(e); cb({ type: 'event', event: e }); };
-  const raise = (r, type) => { if (r.alert?.type === type) return; r.alert = { type, since: Date.now(), acked: false }; ev(r.id, type, type === 'fall' ? `${r.name} 낙상 의심 감지` : `${r.name} 장시간 부재 감지`); };
-  const present = (r, p, fall) => { r.present = p; if (p) { r.absentSince = null; if (r.alert?.type === 'absence') { ev(r.id, 'info', `${r.name} 경고 해제 (재실 확인)`); r.alert = null; } } else if (!r.absentSince) r.absentSince = Date.now(); if (fall) raise(r, 'fall'); };
-  setInterval(() => rooms.forEach((r) => {
-    if (!r.online) return;
-    const t = target[r.id]; if (t) for (let i = 0; i < 4; i++) { const d = t[i] - r.ch[i]; r.ch[i] += Math.sign(d) * Math.min(Math.abs(d), 12); }
-    r.lux = lux(r); r.fps = 8 + Math.round(Math.random() * 2); r.rssi = -50 - Math.round(Math.random() * 15);
-    if (!r.present && r.absentSince && Date.now() - r.absentSince > settings.absenceMinutes * 60e3) raise(r, 'absence');
-    if (Math.random() < .002 && r.present && !r.alert) present(r, false); else if (!r.present && !r.alert && Math.random() < .06) present(r, true);
-  }), 500);
-  setInterval(() => rooms.forEach((r) => { r.luxHist.push(r.lux); if (r.luxHist.length > 90) r.luxHist.shift(); }), 2000);
-  rooms.forEach((r) => { for (let i = 0; i < 30; i++) r.luxHist.push(r.lux + Math.round((Math.random() - .5) * 6)); });
-  const rhy = (r, id) => { r.rhythm = id; target[r.id] = id < 0 ? [0,0,0,0] : [...RHYTHMS[id].ch]; };
-  const label = (id) => id < 0 ? '소등' : RHYTHMS[id].name;
+  const E = window.RhyEngine, facility = window.DEMO_FACILITY;
+  const eng = E.createEngine(facility, { sim: true });
+  eng.setOnline(eng.rooms.get('204'), false, '시연');
+  setInterval(() => eng.tick(), 500); setInterval(() => eng.trackHist(), 2000);
   async function api(path, b) {
-    await new Promise((res) => setTimeout(res, 15)); let m;
-    if (path === '/api/meta') return { rhythms: RHYTHMS, rooms: 10, sim: true };
-    if (path === '/api/events') return events.slice(0, 100);
-    if ((m = path.match(/^\/api\/rooms\/(\d+)\/rhythm$/))) { const r = get(m[1]); rhy(r, b.id); ev(r.id, 'control', `${r.name} 리듬: ${label(b.id)}`); return { ok: true }; }
-    if ((m = path.match(/^\/api\/rooms\/(\d+)\/set$/))) { const r = get(m[1]); r.rhythm = -2; const t = target[r.id] || [...r.ch]; t[b.ch] = b.val; target[r.id] = t; return { ok: true }; }
-    if ((m = path.match(/^\/api\/rooms\/(\d+)\/ack$/))) { const r = get(m[1]); if (r.alert) { r.alert.acked = true; ev(r.id, 'info', `${r.name} 경고 확인 처리`); } return { ok: true }; }
-    if ((m = path.match(/^\/api\/rooms\/(\d+)\/resolve$/))) { const r = get(m[1]); r.fallPose = false; if (!r.present) present(r, true); if (r.alert) { ev(r.id, 'info', `${r.name} 경고 해제 (관리자 조치 완료)`); r.alert = null; } return { ok: true }; }
-    if (path === '/api/all/rhythm') { rooms.forEach((r) => r.online && rhy(r, b.id)); ev('all', 'control', `전체 호실 리듬: ${label(b.id)}`); return { ok: true }; }
-    if (path === '/api/settings') { settings = { absenceMinutes: Math.min(1440, Math.max(1, +b.absenceMinutes || 30)), soundOn: !!b.soundOn }; return settings; }
-    if (path === '/api/sim/event') { const r = get(String(b.room)); if (b.type === 'fall') { r.fallPose = true; present(r, true, true); } if (b.type === 'absence') { present(r, false); r.absentSince = Date.now() - settings.absenceMinutes * 60e3 - 1000; } if (b.type === 'offline') { r.online = !r.online; ev(r.id, r.online ? 'info' : 'offline', `${r.name} ${r.online ? '장치 재연결' : '장치 연결 끊김'}`); } return { ok: true }; }
+    await new Promise((r) => setTimeout(r, 10)); let m;
+    if (path === '/api/meta') return { facility, rhythms: E.RHYTHMS, sim: true, maxLive: 4, deviceRooms: [] };
+    if (path === '/api/log') return eng.log();
+    if ((m = path.match(/^\/api\/alerts\/(A-\d+)\/(.+)$/))) return eng.act(m[1], m[2], 'admin');
+    if (path === '/api/handover') return eng.handover('admin');
+    if ((m = path.match(/^\/api\/rooms\/(\d+)\/(rhythm|set)$/))) return eng.control(m[1], m[2] === 'rhythm' ? { type: 'rhythm', id: b.id } : { type: 'set', ch: b.ch, val: b.val });
+    if (path === '/api/settings') return eng.setSettings(b);
+    if (path === '/api/sim') return eng.simEvent(String(b.room), b.type);
     return {};
   }
-  function start(f) { cb = f; const push = () => f({ type: 'rooms', rooms: JSON.parse(JSON.stringify(rooms)).map((r) => ({ ...r, ch: r.ch.map(Math.round) })), settings, t: Date.now() }); push(); setInterval(push, 500); }
+  function start(f) { const push = () => f(JSON.parse(JSON.stringify(eng.snapshot()))); eng.onChange(() => setTimeout(push, 30)); push(); setInterval(push, 500); }
   return { api, start };
 })();
 </script>
-<script>const $ = (s, r = document) => r.querySelector(s);
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-let RHYTHMS = [], rooms = [], settings = { absenceMinutes: 30, soundOn: true }, events = [], openId = null, ws, wsOk = false;
-const CH = [{ n: 'D0 Green', c: '#4ade80' }, { n: 'D1 Yellow', c: '#facc15' }, { n: 'D2 Blue', c: '#60a5fa' }, { n: 'D3 Red', c: '#f87171' }];
+<script>// Rhyturn 관제 앱 (태블릿 PWA). 화면: W-02 현황, W-03 객실 상세(+W-05 조명), W-04 알람 대응, W-08 시스템, W-07 로그, W-10 설정
+const { LEVELS } = window.RhyEngine;
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const LS = { get: (k, d) => { try { return localStorage.getItem(k) ?? d; } catch { return d; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
+const ACTIVE = ['NEW', 'ACKNOWLEDGED', 'DISPATCHED'];
+const STATE_KO = { NEW: '신규', ACKNOWLEDGED: '확인됨', DISPATCHED: '출동 중', RESOLVED: '해소', HANDED_OVER: '인계됨', FALSE_ALARM: '오알람', ESCALATED: '에스컬레이션' };
+const CH = [{ n: 'D0 Green', c: '#4ade80' }, { n: 'D1 Yellow', c: '#facc15' }, { n: 'D2 Blue', c: '#60a5fa' }, { n: 'D3 Red', c: '#f87171' }];
+let meta, facility, rhythms = [], snap = { rooms: [], alerts: [], faults: [], settings: { absenceMinutes: 30, shadowMode: false, soundOn: true } };
+let rooms = new Map(), route = '/', view = {}, zoneFilter = LS.get('zone', 'all'), alertFilter = 'active', zoneOf = {};
 
-function toast(m) { const t = $('#toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(() => (t.style.display = 'none'), 2500); }
+const toast = (m) => { const t = $('#toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(() => (t.style.display = 'none'), 2500); };
 async function api(path, body) {
   if (window.DEMO) return window.DEMO.api(path, body);
   const r = await fetch(path, body === undefined ? {} : { method: 'POST', body: JSON.stringify(body) });
   if (r.status === 401) { location.href = '/login.html'; throw 0; }
-  if (!r.ok) { toast('요청 실패'); throw 0; }
+  if (!r.ok) { const e = await r.json().catch(() => ({})); toast(e.error || '요청 실패'); throw 0; }
   return r.json();
 }
-const status = (r) => !r.online ? 'off' : r.alert?.type === 'fall' ? 'bad' : r.alert ? 'warn' : 'ok';
-const STX = { off: '오프라인', bad: '낙상 의심', warn: '장시간 부재', ok: '정상' };
-const rhName = (r) => (r.rhythm >= 0 ? RHYTHMS[r.rhythm].name : r.rhythm === -1 ? '소등' : '수동 조절');
 const mmss = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return s >= 3600 ? `${Math.floor(s / 3600)}시간 ${Math.floor((s % 3600) / 60)}분` : `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; };
 
-// ---------- 시뮬레이션 영상(장치 없는 호실) ----------
-function drawScene(cv, r) {
-  const w = cv.width = 320, h = cv.height = 240, g = cv.getContext('2d');
-  g.fillStyle = r.online ? '#FAF4C0' : '#e9e6d6'; g.fillRect(0, 0, w, h);
-  g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.fillStyle = r.online ? '#7a5c00' : '#8d887a'; g.font = '700 64px "Noto Sans KR",sans-serif'; g.fillText(r.name, w / 2, h / 2 - 8);
-  g.font = '500 16px "Noto Sans KR",sans-serif'; g.fillStyle = r.online ? '#9a7b12' : '#a09b8c'; g.fillText(r.online ? '카메라 영상 영역' : '신호 없음', w / 2, h / 2 + 40);
+// ---------- 상태 계산: 타일 색 = 미해소 알람 중 최고 등급, SYS는 별개 축 ----------
+const activeAlerts = (id) => snap.alerts.filter((a) => (id ? a.room === id : true) && ACTIVE.includes(a.state));
+function levelOf(r) {
+  const as = activeAlerts(r.id); if (as.length) return as.reduce((m, a) => (LEVELS[a.level].rank > LEVELS[m].rank ? a.level : m), 'L2');
+  return r.online && r.present ? 'L1' : 'L0';
 }
-const isRealCam = (r) => r.mode === 'device';
+const lvBadge = (k) => `<span class="lv-${k}" style="color:var(--lv)">${LEVELS[k].glyph} ${LEVELS[k].name}</span>`;
+const rhName = (r) => (r.rhythm >= 0 ? rhythms[r.rhythm].name : r.rhythm === -1 ? '소등' : '수동');
 
-// ---------- 상단 ----------
-function renderTop() {
-  const c = { ok: 0, warn: 0, bad: 0, off: 0 }; rooms.forEach((r) => c[status(r)]++);
-  $('#sums').innerHTML = `<span class="chip"><span class="dot ok"></span>정상 <b>${c.ok}</b></span><span class="chip"><span class="dot warn"></span>주의 <b>${c.warn}</b></span><span class="chip"><span class="dot bad"></span>경고 <b>${c.bad}</b></span><span class="chip"><span class="dot"></span>오프라인 <b>${c.off}</b></span>`;
-  $('#cnt').textContent = `총 ${rooms.length}개 호실`;
-  $('#snd').classList.toggle('on', settings.soundOn); $('#snd').textContent = settings.soundOn ? '🔔 경고음 켜짐' : '🔕 경고음 꺼짐';
+// ---------- 라우터 ----------
+function go(p) { location.hash = '#' + p; }
+function onRoute() {
+  leave(); route = location.hash.slice(1) || '/'; view = {}; const v = $('#view'); v.scrollTop = 0;
+  const [, a, b] = route.split('/');
+  document.querySelectorAll('.nav').forEach((n) => n.classList.toggle('act', n.dataset.go === (a ? '/' + a : '/') || (a === 'room' && n.dataset.go === '/')));
+  if (!a) buildBoard(); else if (a === 'room') buildRoom(b); else if (a === 'alerts') buildAlerts(); else if (a === 'system') buildSystem(); else if (a === 'log') buildLog(); else if (a === 'settings') buildSettings(); else go('/');
+  view.ready = true; refresh();
 }
-function renderAlerts() {
-  const list = rooms.filter((r) => r.alert).sort((a, b) => a.alert.since - b.alert.since);
-  $('#alerts').innerHTML = list.map((r) => `<div class="alert ${r.alert.type} ${r.alert.acked ? 'acked' : ''}" data-r="${r.id}">
-    <span class="ic">${r.alert.type === 'fall' ? '🚨' : '⚠️'}</span><span>${r.name} ${r.alert.type === 'fall' ? '낙상 의심' : '장시간 부재'} · ${mmss(Date.now() - r.alert.since)} 경과${r.alert.acked ? ' (확인됨)' : ''}</span><span class="sp" style="flex:1"></span>
-    <button class="btn sm" data-a="view">영상 보기</button>${r.alert.acked ? '' : '<button class="btn sm" data-a="ack">확인</button>'}<button class="btn sm" data-a="resolve">조치 완료</button></div>`).join('');
-}
-$('#alerts').onclick = async (e) => {
-  const b = e.target.closest('button'); if (!b) return; const id = b.closest('.alert').dataset.r;
-  if (b.dataset.a === 'view') openRoom(id); else await api(`/api/rooms/${id}/${b.dataset.a}`, {});
-};
+function leave() { const im = $('#vimg'); if (im) im.src = ''; clearInterval(view.timer); }
+window.addEventListener('hashchange', onRoute);
+$('#rail').onclick = (e) => { const b = e.target.closest('.nav'); if (b) go(b.dataset.go); };
 
-// ---------- 카드 그리드 ----------
-function cardHTML(r) {
-  const s = status(r); const dc = { ok: 'ok', warn: 'warn', bad: 'bad', off: '' }[s];
-  const bars = r.ch.map((v, i) => `<i><span style="width:${Math.min(100, v / 160 * 100)}%;background:${CH[i].c}"></span></i>`).join('');
-  return `<div class="card ${r.alert ? 'alert-' + r.alert.type : ''} ${r.online ? '' : 'offline'}" data-r="${r.id}">
-  <div class="thumb">${isRealCam(r) ? `<img alt="" data-th="${r.id}">` : `<canvas data-cv="${r.id}"></canvas><span class="sim">시뮬레이션</span>`}
-    ${r.alert ? `<span class="tag ${r.alert.type === 'fall' ? 'bad' : 'warn'}">${r.alert.type === 'fall' ? '🚨 낙상 의심' : '⚠ 장시간 부재'}</span>` : ''}</div>
-  <div class="cbody"><div class="chead"><strong>${esc(r.name)}</strong><span class="st"><span class="dot ${dc}"></span>${STX[s]}</span></div>
-  <div class="kv"><div>조도<b>${r.online ? r.lux + ' lx' : '-'}</b></div><div>재실<b>${!r.online ? '-' : r.present ? '재실' : '부재 ' + mmss(Date.now() - r.absentSince)}</b></div>
-  <div style="grid-column:span 2">조명<b>${r.online ? esc(rhName(r)) : '-'}</b></div></div><div class="bars">${bars}</div></div></div>`;
+// ---------- W-02 전체 현황판 ----------
+function summary() {
+  const c = { L4: 0, L3: 0, L2: 0, L1: 0, L0: 0, SYS: 0 };
+  snap.rooms.forEach((r) => { c[levelOf(r)]++; if (!r.online) c.SYS++; });
+  return Object.keys(c).map((k) => `<span class="chip lv-${k}"><span class="g">${LEVELS[k].glyph}</span>${LEVELS[k].name} <b>${c[k]}</b></span>`).join('');
 }
-function renderGrid() {
-  const order = (r) => (r.alert && !r.alert.acked ? 0 : r.alert ? 1 : r.online ? 2 : 3);
-  const sorted = [...rooms].sort((a, b) => order(a) - order(b) || a.id - b.id);
-  const g = $('#grid'); const sig = sorted.map((r) => r.id + status(r) + r.mode).join();
-  if (g.dataset.sig !== sig) { g.innerHTML = sorted.map(cardHTML).join(''); g.dataset.sig = sig; }
-  else sorted.forEach((r) => { const el = g.querySelector(`[data-r="${r.id}"]`); const t = document.createElement('div'); t.innerHTML = cardHTML(r); const n = t.firstElementChild;
-    el.querySelector('.cbody').replaceWith(n.querySelector('.cbody')); });
-  g.querySelectorAll('canvas[data-cv]').forEach((cv) => drawScene(cv, rooms.find((r) => r.id === cv.dataset.cv)));
+function tileHTML(r) {
+  const lv = levelOf(r), L = LEVELS[lv], dev = r.mode === 'device';
+  return `<button class="tile lv-${lv} ${r.online ? '' : 'off'}" data-room="${r.id}" style="--bar:${L.bar}px">
+    ${r.online ? '' : '<span class="sysb">▣ 점검</span>'}
+    <div class="cam">${dev ? `<img data-th="${r.id}" alt="">` : ''}<span>${esc(r.name)}</span><small>${dev ? '실제 카메라' : '시뮬레이션'}</small></div>
+    <div class="body"><div class="st"><span class="nm">${esc(r.name)}</span><span class="lvl">${L.glyph} ${L.name}${activeAlerts(r.id).length > 1 ? ' +' + (activeAlerts(r.id).length - 1) : ''}</span></div>
+    <div class="kv"><span>조도 <b data-k="lux">-</b></span><span><b data-k="pres">-</b></span><span>조명 <b data-k="rh">-</b></span></div></div></button>`;
 }
-$('#grid').onclick = (e) => { const c = e.target.closest('.card'); if (c) openRoom(c.dataset.r); };
-setInterval(() => { document.querySelectorAll('img[data-th]').forEach((im) => { const u = `/api/rooms/${im.dataset.th}/thumb?t=${Date.now()}`; const t = new Image(); t.onload = () => (im.src = u); t.src = u; }); }, 2000);
+function buildBoard() {
+  $('#view').innerHTML = `<div class="chips" id="sum"></div><div style="margin:12px 0" class="seg" id="zseg"></div><div id="zones"></div>`;
+  $('#zseg').innerHTML = `<button class="btn sm ${zoneFilter === 'all' ? 'on' : ''}" data-z="all">전체</button>` + facility.zones.map((z) => `<button class="btn sm ${zoneFilter === z.id ? 'on' : ''}" data-z="${z.id}">${esc(z.name)}${z.poc ? ' · PoC' : ''}${z.assumed ? ' · 가정' : ''}</button>`).join('');
+  $('#zseg').onclick = (e) => { const b = e.target.closest('button'); if (b) { zoneFilter = b.dataset.z; LS.set('zone', zoneFilter); buildBoard(); refresh(); } };
+  $('#zones').onclick = (e) => { const t = e.target.closest('.tile'); if (t) go('/room/' + t.dataset.room); };
+  view.sig = '';
+}
+function refreshBoard() {
+  $('#sum').innerHTML = summary();
+  const sig = snap.rooms.map((r) => r.id + levelOf(r) + r.online + r.mode + activeAlerts(r.id).length).join();
+  if (sig !== view.sig) {
+    view.sig = sig;
+    $('#zones').innerHTML = facility.zones.filter((z) => zoneFilter === 'all' || z.id === zoneFilter).map((z) => `
+      <h2 class="sec">${esc(z.name)} (${z.floor}·${z.id}구역)${z.poc ? '<span class="tag">PoC 1구역</span>' : ''}${z.assumed ? '<span class="tag">3층 복제 가정</span>' : ''}<span class="tag">${z.rooms[0]}–${z.rooms[z.rooms.length - 1]}호</span></h2>
+      <div class="grid">${z.rooms.map((id) => tileHTML(rooms.get(id))).join('')}</div>`).join('');
+  }
+  snap.rooms.forEach((r) => { const t = $(`.tile[data-room="${r.id}"]`); if (!t) return;
+    t.querySelector('[data-k=lux]').textContent = r.online ? r.lux + ' lx' : '-';
+    t.querySelector('[data-k=pres]').textContent = !r.online ? '-' : r.present ? '재실' : '부재 ' + mmss(Date.now() - r.absentSince);
+    t.querySelector('[data-k=rh]').textContent = r.online ? rhName(r) : '-'; });
+}
+setInterval(() => document.querySelectorAll('img[data-th]').forEach((im) => { const u = `/api/rooms/${im.dataset.th}/thumb?t=${Date.now()}`; const t = new Image(); t.onload = () => (im.src = u); t.src = u; }), 2000);
 
-// ---------- 상세 모달 ----------
-const ROWH = (r) => `<div class="video" id="vid">${isRealCam(r) ? `<img id="vimg" alt="">` : '<canvas id="vcv"></canvas>'}<div class="msg">영상 없음 · 장치 오프라인</div></div><div class="lat" id="lat"></div>
-<div class="sec" style="margin-top:12px"><h4>조도 추이 (BH1750 · 최근 3분)</h4><canvas class="chart" id="chart"></canvas></div>
-<div class="sec"><h4>호실 이벤트</h4><div class="log" id="elog"></div></div>`;
-function openRoom(id) {
-  const r = rooms.find((x) => x.id === id); if (!r) return; openId = id;
-  $('#sheet').innerHTML = `<header><h3>${esc(r.name)}</h3><span class="st" id="mst"></span><span class="sp" style="flex:1"></span><span id="mact"></span><button class="btn sm" id="close">닫기 ✕</button></header>
-  <div class="sbody"><div>${ROWH(r)}</div><div>
-   <div class="sec"><h4>간단 조절</h4>
-    <div class="sl"><label>밝기</label><input type="range" id="bri" min="0" max="100" value="${LS.get('bri' + id, 50)}"><span class="v" id="briV"></span></div>
-    <div class="cct"></div><div class="sl"><label>색온도</label><input type="range" id="cct" min="0" max="100" value="${LS.get('cct' + id, 30)}"><span class="v" id="cctV"></span></div></div>
-   <div class="sec"><h4>생체리듬 모드</h4><div class="rg" id="rg">${RHYTHMS.map((h, i) => `<button class="btn" data-i="${i}">${h.name}<small>${h.en}</small></button>`).join('')}<button class="btn danger wide" data-i="-1">전체 소등</button></div></div>
-   <div class="sec"><details><summary>채널 직접 조절 (전문가)</summary>${CH.map((c, i) => `<div class="sl"><label><span class="dot" style="background:${c.c}"></span> ${c.n}</label><input type="range" min="0" max="255" id="s${i}"><span class="v" id="v${i}">0</span></div>`).join('')}</details></div>
+// ---------- 알람 카드 (W-04) ----------
+function alertCard(a, showRoom = true) {
+  const L = LEVELS[a.level], act = ACTIVE.includes(a.state), r = rooms.get(a.room);
+  const steps = [['NEW', '신규'], ['ACKNOWLEDGED', '확인'], ['DISPATCHED', '출동'], ['RESOLVED', '해소']];
+  const idx = a.state === 'FALSE_ALARM' ? -1 : ['NEW', 'ACKNOWLEDGED', 'DISPATCHED', 'RESOLVED', 'HANDED_OVER'].indexOf(a.state);
+  const btn = (act_, label, cls = '') => `<button class="btn sm ${cls}" data-act="${act_}" data-id="${a.id}">${label}</button>`;
+  return `<div class="alert-card lv-${a.level}" style="--bar:${L.bar}px"><div>
+    <div class="t"><span class="g">${L.glyph} ${L.name}</span> · ${esc(a.title)} ${a.escalated ? '<span class="esc">· 3분 미확인 에스컬레이션</span>' : ''}</div>
+    <div class="m">${showRoom ? `<a href="#/room/${a.room}" style="color:inherit;font-weight:700">${esc(r?.name || a.room)}</a> · ` : ''}${a.code} · ${a.id} · ${STATE_KO[a.state]} · ${act ? `<span data-since="${a.created}">${mmss(Date.now() - a.created)}</span> 경과` : new Date(a.last?.t || a.created).toLocaleTimeString('ko-KR')}</div></div>
+    <div class="acts">${act ? (a.state === 'NEW' ? btn('ack', '확인', 'primary') : '') + (a.state !== 'DISPATCHED' ? btn('dispatch', '출동', a.state === 'ACKNOWLEDGED' ? 'primary' : '') : '') + btn('resolve', '해소', a.state === 'DISPATCHED' ? 'primary' : '') + btn('false-alarm', '오알람', 'warn') : ''}</div>
+    <div class="flow">${a.state === 'FALSE_ALARM' ? '<span class="on">오알람 (튜닝 데이터셋)</span>' : steps.map(([k, n], i) => `<span class="${i <= idx ? 'on' : ''}">${n}</span>`).join('') + (a.state === 'HANDED_OVER' ? '<span class="on">인계됨</span>' : '')}</div></div>`;
+}
+async function onAlertAct(e) {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  try { await api(`/api/alerts/${b.dataset.id}/${b.dataset.act}`, {}); } catch {}
+}
+function buildAlerts() {
+  $('#view').innerHTML = `<div class="seg" style="margin-bottom:12px"><button class="btn sm on" data-f="active">진행 중</button><button class="btn sm" data-f="all">전체(최근)</button><span class="sp" style="flex:1"></span><button class="btn sm" id="hand">근무 인계</button></div><div id="alist"></div>`;
+  $('#view').querySelector('.seg').onclick = async (e) => { const b = e.target.closest('button'); if (!b) return;
+    if (b.id === 'hand') { const r = await api('/api/handover', {}); return toast(`해소 알람 ${r.count}건을 인계했습니다`); }
+    alertFilter = b.dataset.f; document.querySelectorAll('.seg [data-f]').forEach((x) => x.classList.toggle('on', x === b)); view.sig = ''; refresh(); };
+  $('#alist').onclick = onAlertAct; view.sig = '';
+}
+function refreshAlerts() {
+  const list = snap.alerts.filter((a) => alertFilter === 'all' || ACTIVE.includes(a.state)).sort((a, b) => (ACTIVE.includes(b.state) - ACTIVE.includes(a.state)) || LEVELS[b.level].rank - LEVELS[a.level].rank || b.created - a.created);
+  const sig = list.map((a) => a.id + a.state + a.escalated).join();
+  if (sig !== view.sig) { view.sig = sig; $('#alist').innerHTML = list.map((a) => alertCard(a)).join('') || '<div class="empty">진행 중인 알람이 없습니다.</div>'; }
+}
+
+// ---------- W-03 객실 상세 + W-05 조명 ----------
+function buildRoom(id) {
+  const r = rooms.get(id); if (!r) return go('/'); const z = zoneOf[r.zone], dev = r.mode === 'device';
+  $('#view').innerHTML = `<button class="btn sm back" onclick="history.length>1?history.back():go('/')">← 현황</button>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px"><h2 style="margin:0;font-size:24px">${esc(r.name)}</h2><span id="rlv" style="font-weight:800"></span><span class="tag">${esc(z.name)}</span><span class="tag">${esc(r.unitId)}</span><span class="tag">${dev ? '실제 장치' : '시뮬레이션'}</span><span class="sp" style="flex:1"></span><span class="conn" id="rst"></span></div>
+  <div class="cols"><div>
+    <div class="video" id="vid">${dev ? '<img id="vimg" alt="">' : ''}<div class="big">${esc(r.name)}</div><div style="opacity:.7">카메라 영상 영역</div></div><div class="conn" id="lat" style="margin:6px 0 12px"></div>
+    <div class="card"><h3>조도 추이 (BH1750 · 최근 약 3분)</h3><canvas class="chart" id="chart"></canvas></div>
+    <div class="card"><h3>타임라인</h3><div class="log" id="tl"></div></div>
+  </div><div>
+    <div class="card"><h3>이 호실의 알람</h3><div id="ra"></div></div>
+    <div class="card"><h3>조명 제어 (W-05)</h3>
+      <div class="sl"><label>밝기</label><input type="range" id="bri" min="0" max="100" value="${LS.get('bri' + id, 50)}"><span class="v" id="briV"></span></div>
+      <div class="sl"><label>색온도</label><input type="range" id="cct" min="0" max="100" value="${LS.get('cct' + id, 30)}"><span class="v" id="cctV"></span></div>
+      <div class="rg" id="rg" style="margin-top:12px">${rhythms.map((h, i) => `<button class="btn" data-i="${i}">${h.name}<small>${h.en}</small></button>`).join('')}<button class="btn wide" data-i="-1">전체 소등</button></div>
+      <details style="margin-top:12px"><summary style="cursor:pointer;color:var(--mute);font-weight:700">채널 직접 조절 (전문가)</summary>${CH.map((c, i) => `<div class="sl"><label>${c.n}</label><input type="range" min="0" max="255" id="s${i}"><span class="v" id="v${i}">0</span></div>`).join('')}</details>
+    </div>
+    <div class="card"><h3>공간 정보 (facility.json)</h3><div class="log" style="max-height:none">침상 수 <b>${r.beds ?? '미확정'}</b> · 실면적 <b>${facility.rooms.find((x) => x.id === id).area ?? '미확정'}</b> · 입소자 프로파일 <b>${facility.rooms.find((x) => x.id === id).profile ?? '미확정'}</b>${z.assumed ? '<br>이 호실 번호는 3층 복제 가정값입니다.' : ''}</div></div>
   </div></div>`;
-  $('#modal').classList.add('open'); $('#close').onclick = closeRoom;
-  const vimg = $('#vimg'); if (vimg) { vimg.onerror = () => { $('#vid').classList.add('dead'); setTimeout(() => openId && (vimg.src = `/api/rooms/${id}/stream?t=${Date.now()}`), 2000); }; vimg.onload = () => $('#vid').classList.remove('dead'); vimg.src = `/api/rooms/${id}/stream`; } // 끊김 시 자동 재연결
-  const simple = () => {
-    const b = +$('#bri').value, t = +$('#cct').value; $('#briV').textContent = b + '%'; $('#cctV').textContent = t < 34 ? '따뜻함' : t < 67 ? '중간' : '차가움';
-    LS.set('bri' + id, b); LS.set('cct' + id, t); const m = t / 100, warm = [.35, 1, 0, .9], cool = [1, .25, 1, .1], mx = [160, 70, 90, 60];
-    return warm.map((w, i) => Math.round((w * (1 - m) + cool[i] * m) * mx[i] * b / 100));
-  };
-  let timer; const pushAll = () => { const v = simple(); clearTimeout(timer); timer = setTimeout(() => v.forEach((x, i) => api(`/api/rooms/${id}/set`, { ch: i, val: x })), 120); };
-  $('#bri').oninput = $('#cct').oninput = pushAll; simple();
-  $('#rg').onclick = async (e) => { const b = e.target.closest('button'); if (!b) return; const t0 = performance.now(); await api(`/api/rooms/${id}/rhythm`, { id: +b.dataset.i }); $('#lat').textContent = `명령 응답 ${Math.round(performance.now() - t0)} ms (목표: 1초 이내)`; };
-  for (let i = 0; i < 4; i++) { let t; $('#s' + i).oninput = (e) => { $('#v' + i).textContent = e.target.value; clearTimeout(t); t = setTimeout(() => api(`/api/rooms/${id}/set`, { ch: i, val: +e.target.value }), 60); dragUntil = Date.now() + 1500; }; }
-  refreshModal();
+  view.room = id; view.dragUntil = 0; view.asig = '';
+  if (dev) { const im = $('#vimg'); im.onerror = () => { $('#vid').classList.add('dead'); setTimeout(() => view.room === id && (im.src = `/api/rooms/${id}/stream?t=${Date.now()}`), 2500); }; im.onload = () => $('#vid').classList.remove('dead'); im.src = `/api/rooms/${id}/stream`; }
+  const simple = () => { const b = +$('#bri').value, t = +$('#cct').value; $('#briV').textContent = b + '%'; $('#cctV').textContent = t < 34 ? '따뜻함' : t < 67 ? '중간' : '차가움';
+    LS.set('bri' + id, b); LS.set('cct' + id, t); const m = t / 100, w = [.35, 1, 0, .9], c = [1, .25, 1, .1], mx = [160, 70, 90, 60]; return w.map((x, i) => Math.round((x * (1 - m) + c[i] * m) * mx[i] * b / 100)); };
+  let tm; const push = () => { const v = simple(); view.dragUntil = Date.now() + 1500; clearTimeout(tm); tm = setTimeout(() => v.forEach((x, i) => api(`/api/rooms/${id}/set`, { ch: i, val: x }).catch(() => {})), 120); };
+  $('#bri').oninput = $('#cct').oninput = push; simple();
+  $('#rg').onclick = async (e) => { const b = e.target.closest('button'); if (!b) return; const t0 = performance.now(); try { await api(`/api/rooms/${id}/rhythm`, { id: +b.dataset.i }); $('#lat').textContent = `조명 명령 응답 ${Math.round(performance.now() - t0)} ms (목표 1초 이내)`; } catch {} };
+  for (let i = 0; i < 4; i++) { let t; $('#s' + i).oninput = (e) => { $('#v' + i).textContent = e.target.value; view.dragUntil = Date.now() + 1500; clearTimeout(t); t = setTimeout(() => api(`/api/rooms/${id}/set`, { ch: i, val: +e.target.value }).catch(() => {}), 60); }; }
+  $('#ra').onclick = onAlertAct;
+  const loadTl = async () => { try { const l = await api('/api/log'); $('#tl') && ($('#tl').innerHTML = l.events.filter((e) => e.room === id || e.room === 'all').slice(0, 40).map((e) => `${new Date(e.t).toLocaleTimeString('ko-KR')} · <b>${esc(e.msg)}</b>`).join('<br>') || '이벤트 없음'); } catch {} };
+  loadTl(); view.timer = setInterval(loadTl, 3000);
 }
-let dragUntil = 0;
-function closeRoom() { openId = null; $('#modal').classList.remove('open'); $('#sheet').innerHTML = ''; }
-$('#modal').onclick = (e) => { if (e.target.id === 'modal') closeRoom(); };
-document.addEventListener('keydown', (e) => e.key === 'Escape' && closeRoom());
-
-function refreshModal() {
-  if (!openId) return; const r = rooms.find((x) => x.id === openId); if (!r) return; const s = status(r);
-  $('#mst').innerHTML = `<span class="dot ${{ ok: 'ok', warn: 'warn', bad: 'bad', off: '' }[s]}"></span>${STX[s]} · ${r.online ? `조도 ${r.lux} lx · ${r.present ? '재실' : '부재'}` : ''}${r.rssi ? ` · Wi-Fi ${r.rssi} dBm` : ''}`;
-  $('#mact').innerHTML = r.alert ? `${r.alert.acked ? '' : '<button class="btn sm danger" data-a="ack">확인</button> '}<button class="btn sm" data-a="resolve">조치 완료</button>` : '';
-  $('#mact').onclick = async (e) => { const b = e.target.closest('button'); if (b) await api(`/api/rooms/${openId}/${b.dataset.a}`, {}); };
+function refreshRoom() {
+  const r = rooms.get(view.room); if (!r) return; const lv = levelOf(r);
+  $('#rlv').innerHTML = lvBadge(lv) + (r.online ? '' : ' <span style="color:var(--sys)">▣ 점검(오프라인)</span>');
+  $('#rst').textContent = r.online ? `조도 ${r.lux} lx · ${r.present ? '재실' : '부재 ' + mmss(Date.now() - r.absentSince)}${r.rssi ? ' · Wi-Fi ' + r.rssi + ' dBm' : ''}${r.fps ? ' · ' + r.fps + ' fps' : ''}` : '유닛 오프라인';
+  if (r.mode !== 'device') $('#vid').classList.toggle('dead', !r.online);
+  const as = snap.alerts.filter((a) => a.room === r.id && ACTIVE.includes(a.state)), sig = as.map((a) => a.id + a.state + a.escalated).join();
+  if (sig !== view.asig) { view.asig = sig; $('#ra').innerHTML = as.map((a) => alertCard(a, false)).join('') || '<div class="empty" style="padding:8px">진행 중인 알람 없음</div>'; }
   $('#rg').querySelectorAll('button').forEach((b) => b.classList.toggle('active', +b.dataset.i === r.rhythm));
-  if (Date.now() > dragUntil) r.ch.forEach((v, i) => { $('#s' + i).value = v; $('#v' + i).textContent = v; });
-  if (!isRealCam(r)) { drawScene($('#vcv'), r); $('#vid').classList.toggle('dead', !r.online); } else if (!r.online) $('#vid').classList.add('dead');
+  if (Date.now() > view.dragUntil) r.ch.forEach((v, i) => { $('#s' + i).value = v; $('#v' + i).textContent = v; });
   drawChart($('#chart'), r.luxHist);
-  $('#elog').innerHTML = events.filter((e) => e.room === openId || e.room === 'all').slice(0, 30).map((e) => `${new Date(e.t).toLocaleTimeString('ko-KR')} · <b>${esc(e.msg)}</b>`).join('<br>') || '이벤트 없음';
 }
 function drawChart(cv, d) {
   const dpr = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight; cv.width = w * dpr; cv.height = h * dpr; const g = cv.getContext('2d'); g.scale(dpr, dpr);
   const css = getComputedStyle(document.documentElement), acc = css.getPropertyValue('--acc'), line = css.getPropertyValue('--line'), mute = css.getPropertyValue('--mute');
   const max = Math.max(50, ...d) * 1.15; g.strokeStyle = line; g.lineWidth = 1; g.fillStyle = mute; g.font = '11px sans-serif';
   [0, .5, 1].forEach((f) => { const y = h - 14 - f * (h - 22); g.beginPath(); g.moveTo(34, y); g.lineTo(w, y); g.stroke(); g.fillText(Math.round(max * f), 2, y + 4); });
-  if (d.length < 2) return; g.strokeStyle = acc; g.lineWidth = 2; g.beginPath();
-  d.forEach((v, i) => { const x = 34 + i / (d.length - 1) * (w - 38), y = h - 14 - v / max * (h - 22); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+  if (d.length < 2) return; g.strokeStyle = acc; g.lineWidth = 2; g.beginPath(); d.forEach((v, i) => { const x = 34 + i / (d.length - 1) * (w - 38), y = h - 14 - v / max * (h - 22); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
 }
 
-// ---------- 소리 ----------
-let actx; document.addEventListener('click', () => { try { actx = actx || new AudioContext(); actx.resume(); } catch {} }, { once: false });
-function beep(f = 880) { if (!actx || actx.state !== 'running') return; const o = actx.createOscillator(), g = actx.createGain(); o.frequency.value = f; g.gain.value = .15; o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + .25); }
-setInterval(() => { if (settings.soundOn && rooms.some((r) => r.alert && !r.alert.acked)) { beep(rooms.some((r) => r.alert?.type === 'fall' && !r.alert.acked) ? 988 : 660); } }, 2500);
+// ---------- W-08 시스템 상태 ----------
+function buildSystem() { $('#view').innerHTML = `<div class="card"><h3>점검(SYS) 알림 — 기술 채널, 케어 알람과 별개</h3><div id="flt"></div></div><div class="card"><h3>유닛 상태</h3><div style="overflow:auto"><table class="t" id="ut"></table></div></div>`; view.sig = ''; }
+function refreshSystem() {
+  const open = snap.faults.filter((f) => !f.closed);
+  $('#flt').innerHTML = open.map((f) => `<div class="alert-card lv-SYS" style="--bar:3px;border-left-style:dashed"><div><div class="t"><span class="g">▣ 점검</span> · ${f.code} ${esc(f.title)}</div><div class="m">${esc(rooms.get(f.room)?.name)} · ${mmss(Date.now() - f.opened)} 경과</div></div></div>`).join('') || '<div class="empty" style="padding:8px">열린 점검 알림 없음</div>';
+  $('#ut').innerHTML = `<tr><th>유닛 ID</th><th>호실</th><th>구분</th><th>상태</th><th>Wi-Fi</th><th>FPS</th><th>마지막 수신</th></tr>` +
+    snap.rooms.map((r) => `<tr><td>${esc(r.unitId)}</td><td>${esc(r.name)}</td><td>${r.mode === 'device' ? '실제 장치' : '시뮬레이션'}</td><td class="lv-${r.online ? 'L1' : 'SYS'}"><span class="g">${r.online ? '▬ 정상' : '▣ 오프라인'}</span></td><td>${r.rssi ? r.rssi + ' dBm' : '-'}</td><td>${r.online ? r.fps : '-'}</td><td>${r.online ? '방금' : mmss(Date.now() - r.lastSeen) + ' 전'}</td></tr>`).join('');
+}
 
-// ---------- 설정/상단 버튼 ----------
-$('#setb').onclick = () => { $('#absMin').value = settings.absenceMinutes; $('#pop').classList.toggle('open'); };
-$('#saveSet').onclick = async () => { settings = await api('/api/settings', { absenceMinutes: +$('#absMin').value, soundOn: settings.soundOn }); toast('저장됨'); };
-$('#snd').onclick = async () => { settings = await api('/api/settings', { absenceMinutes: settings.absenceMinutes, soundOn: !settings.soundOn }); renderTop(); };
-$('#out').onclick = async () => { if (window.DEMO) return toast('데모 화면에서는 로그아웃이 없습니다'); await fetch('/api/logout'); location.href = '/login.html'; };
-$('#theme').onclick = () => { const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; LS.set('theme', t); };
-document.documentElement.dataset.theme = LS.get('theme', 'light');
-document.querySelectorAll('[data-sim]').forEach((b) => (b.onclick = () => api('/api/sim/event', { room: $('#simRoom').value, type: b.dataset.sim })));
-$('#allGo').onclick = async () => { const v = +$('#allR').value; if (confirm(`온라인 전체 호실에 '${v < 0 ? '전체 소등' : RHYTHMS[v].name}'을(를) 적용할까요?`)) { await api('/api/all/rhythm', { id: v }); toast('전체 적용됨'); } };
+// ---------- W-07 로그 (alert_transition) ----------
+function buildLog() { $('#view').innerHTML = `<div class="card"><h3>알람 상태 전이 (alert_transition: 알람ID · 상태 · 행위자 · 시각)</h3><div style="overflow:auto"><table class="t" id="tr"></table></div></div><div class="card"><h3>이벤트 로그</h3><div class="log" id="ev" style="max-height:none"></div></div>`;
+  const load = async () => { try { const l = await api('/api/log'); $('#tr').innerHTML = '<tr><th>알람 ID</th><th>호실</th><th>상태</th><th>행위자</th><th>시각</th></tr>' + l.transitions.map((t) => `<tr><td>${t.alertId}</td><td>${esc(rooms.get(t.room)?.name)}</td><td>${STATE_KO[t.state] || t.state}</td><td>${esc(t.actor)}</td><td>${new Date(t.t).toLocaleString('ko-KR')}</td></tr>`).join('');
+    $('#ev').innerHTML = l.events.map((e) => `${new Date(e.t).toLocaleTimeString('ko-KR')} · <b>${esc(e.msg)}</b>`).join('<br>'); } catch {} };
+  load(); view.timer = setInterval(load, 3000);
+}
+
+// ---------- W-10 설정 ----------
+function buildSettings() {
+  const s = snap.settings, unk = facility.rooms.filter((r) => r.beds == null).length;
+  $('#view').innerHTML = `<div class="cols"><div><div class="card"><h3>알람 기준</h3>
+    <div class="set"><div>장시간 부재 기준<small>재실이 이 시간 이상 없으면 E-01 주의(L3)</small></div><div><input id="absMin" type="number" min="1" max="1440" value="${s.absenceMinutes}" style="width:90px"> 분</div></div>
+    <div class="set"><div>Shadow Mode<small>켜면 알림을 보내지 않고 로그만 기록 (파일럿 첫 2주)</small></div><button class="btn sm ${s.shadowMode ? 'on' : ''}" id="shadow">${s.shadowMode ? '켜짐' : '꺼짐'}</button></div>
+    <div class="set"><div>경고음<small>긴급(L4)은 반복음, 주의(L3)는 단발음</small></div><button class="btn sm ${s.soundOn ? 'on' : ''}" id="snd">${s.soundOn ? '켜짐' : '꺼짐'}</button></div>
+    <div class="set"><div>쿨다운 / 에스컬레이션<small>같은 호실·같은 이벤트 재발 억제 / L4 미확인 시 에스컬레이션</small></div><b>180초 / 3분</b></div>
+    <div style="text-align:right;margin-top:10px"><button class="btn primary" id="save">저장</button></div></div>
+    <div class="card"><h3>화면</h3><div class="set"><div>테마</div><button class="btn sm" id="theme">라이트 / 다크 전환</button></div>
+    <div class="set"><div>로그아웃</div><button class="btn sm" id="out">로그아웃</button></div></div></div>
+  <div><div class="card"><h3>공간 마스터 (facility.json)</h3><div class="log" style="max-height:none">${esc(facility.name)} · 구역 ${facility.zones.length}개 · 호실 ${facility.rooms.length}개<br>호실별 침상 수 미확정: <b>${unk}개</b><br>2층(C·D 구역)은 3층 복제 가정값입니다.<br>확정 필요: 침상 수 · 실면적 · 입소자 프로파일 · 복도 실측 길이 · 2층 실제 호실 번호</div></div>
+  ${meta.sim ? `<div class="card"><h3>시연 도구 (시뮬레이션 호실)</h3><div class="set"><select id="simRoom">${facility.rooms.map((r) => `<option value="${r.id}">${r.name}</option>`).join('')}</select></div>
+    <div class="seg"><button class="btn sm" data-sim="fall">낙상 의심(L4)</button><button class="btn sm" data-sim="absence">장시간 부재(L3)</button><button class="btn sm" data-sim="nomotion">무동작(L3)</button><button class="btn sm" data-sim="watch">야간 각성(L2)</button><button class="btn sm" data-sim="offline">오프라인 토글</button></div></div>` : ''}</div></div>`;
+  const cur = () => ({ absenceMinutes: +$('#absMin').value, shadowMode: $('#shadow').textContent === '켜짐', soundOn: $('#snd').textContent === '켜짐' });
+  const flip = (b) => { const on = b.textContent !== '켜짐'; b.textContent = on ? '켜짐' : '꺼짐'; b.classList.toggle('on', on); };
+  $('#shadow').onclick = (e) => flip(e.target); $('#snd').onclick = (e) => flip(e.target);
+  $('#save').onclick = async () => { await api('/api/settings', cur()); toast('저장됨'); };
+  $('#theme').onclick = () => { const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; LS.set('theme', t); };
+  $('#out').onclick = async () => { if (window.DEMO) return toast('데모에서는 로그아웃이 없습니다'); await fetch('/api/logout'); location.href = '/login.html'; };
+  document.querySelectorAll('[data-sim]').forEach((b) => (b.onclick = () => api('/api/sim', { room: $('#simRoom').value, type: b.dataset.sim })));
+}
+
+// ---------- 배너·사운드·네비 배지 ----------
+let seen = new Set(), actx;
+document.addEventListener('click', () => { try { actx = actx || new AudioContext(); actx.resume(); } catch {} });
+function beep(f) { if (!actx || actx.state !== 'running') return; const o = actx.createOscillator(), g = actx.createGain(); o.frequency.value = f; g.gain.value = .15; o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + .25); }
+setInterval(() => { if (snap.settings.soundOn && snap.alerts.some((a) => a.level === 'L4' && a.state === 'NEW')) beep(988); }, 2500);
+function refreshBanner() {
+  const as = snap.alerts.filter((a) => ['L4', 'L3'].includes(a.level) && ACTIVE.includes(a.state)).sort((a, b) => LEVELS[b.level].rank - LEVELS[a.level].rank || a.created - b.created);
+  const sig = as.map((a) => a.id + a.state).join();
+  if (sig !== view.bsig) { view.bsig = sig; $('#banner').innerHTML = as.map((a) => `<div class="ban ${a.level} ${a.state}${a.state !== 'NEW' ? ' ack' : ''}" data-room="${a.room}"><span style="font-size:20px">${LEVELS[a.level].glyph}</span><span>${LEVELS[a.level].name} · ${esc(rooms.get(a.room)?.name)} ${esc(a.title)} · <span data-since="${a.created}">${mmss(Date.now() - a.created)}</span> 경과 · ${STATE_KO[a.state]}</span><span class="sp" style="flex:1"></span>${a.state === 'NEW' ? `<button class="btn" data-act="ack" data-id="${a.id}">확인</button>` : ''}<button class="btn" data-go="/room/${a.room}">상세</button></div>`).join(''); }
+  const nNew = as.filter((a) => a.state === 'NEW').length; const sys = snap.rooms.filter((r) => !r.online).length;
+  const set = (k, n) => { const e = $(`[data-bd=${k}]`); if (e) { e.style.display = n ? 'flex' : 'none'; e.textContent = n; } };
+  set('alerts', activeAlerts().length); set('sys', sys); set('board', 0);
+  snap.alerts.forEach((a) => { if (!seen.has(a.id)) { seen.add(a.id); if (a.state === 'NEW' && snap.settings.soundOn && a.level === 'L3') beep(660); } });
+}
+$('#banner').onclick = (e) => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.act) onAlertAct(e); else if (b.dataset.go) go(b.dataset.go); };
+setInterval(() => { $('#clock').textContent = new Date().toLocaleString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  document.querySelectorAll('[data-since]').forEach((e) => (e.textContent = mmss(Date.now() - +e.dataset.since))); }, 1000);
+
+function refresh() {
+  if (!snap.rooms.length || !view.ready) return;
+  refreshBanner();
+  const a = route.split('/')[1];
+  if (!a) refreshBoard(); else if (a === 'room') refreshRoom(); else if (a === 'alerts') refreshAlerts(); else if (a === 'system') refreshSystem();
+}
 
 // ---------- 실시간 연결 ----------
+function onState(m) { snap = m; rooms = new Map(m.rooms.map((r) => [r.id, r])); refresh(); }
 function connect() {
-  if (window.DEMO) { $('#conn').textContent = '● 데모 (시뮬레이션)'; $('#conn').style.color = 'var(--ok)'; return window.DEMO.start((m) => { if (m.type === 'rooms') { rooms = m.rooms; settings = m.settings; renderTop(); renderAlerts(); renderGrid(); refreshModal(); } else if (m.type === 'event') { events.unshift(m.event); events.length = Math.min(events.length, 200); } }); }
-  ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/ui');
-  ws.onopen = () => { wsOk = true; $('#conn').textContent = '● 실시간 연결됨'; $('#conn').style.color = 'var(--ok)'; };
-  ws.onmessage = (e) => { const m = JSON.parse(e.data);
-    if (m.type === 'rooms') { rooms = m.rooms; settings = m.settings; renderTop(); renderAlerts(); renderGrid(); refreshModal(); }
-    else if (m.type === 'event') { events.unshift(m.event); events.length = Math.min(events.length, 200); } };
-  ws.onclose = () => { wsOk = false; $('#conn').textContent = '○ 재연결 중…'; $('#conn').style.color = 'var(--bad)'; setTimeout(connect, 1500); };
+  if (window.DEMO) { $('#conn').textContent = '● 데모 (시뮬레이션)'; $('#conn').style.color = 'var(--l1)'; return window.DEMO.start(onState); }
+  const ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/ui');
+  ws.onopen = () => { $('#conn').textContent = '● 실시간 연결됨'; $('#conn').style.color = 'var(--l1)'; };
+  ws.onmessage = (e) => onState(JSON.parse(e.data));
+  ws.onclose = () => { $('#conn').textContent = '○ 재연결 중…'; $('#conn').style.color = 'var(--l4)'; setTimeout(connect, 1500); };
 }
-(async () => {
-  const meta = await api('/api/meta'); RHYTHMS = meta.rhythms; events = await api('/api/events');
-  $('#allR').innerHTML = RHYTHMS.map((h, i) => `<option value="${i}">${h.name}</option>`).join('') + '<option value="-1">전체 소등</option>';
-  $('#simRoom').innerHTML = Array.from({ length: meta.rooms }, (_, i) => `<option>${101 + i}</option>`).join('');
-  $('#simTools').style.display = meta.sim ? '' : 'none';
-  connect(); keepAwake();
-})();
-setInterval(() => { if (rooms.length) renderAlerts(); }, 1000);
-
-// 관제 태블릿 화면 꺼짐 방지
 let wl; async function keepAwake() { try { wl = await navigator.wakeLock?.request('screen'); } catch {} }
 document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && keepAwake());
+document.documentElement.dataset.theme = LS.get('theme', 'light');
+(async () => {
+  meta = await api('/api/meta'); facility = meta.facility; rhythms = meta.rhythms; $('#fname').textContent = facility.name + ' 관제';
+  facility.zones.forEach((z) => (zoneOf[z.id] = z));
+  connect(); keepAwake();
+  await new Promise((res) => { const t = setInterval(() => { if (snap.rooms.length) { clearInterval(t); res(); } }, 50); });
+  onRoute();
+})();
 </script>
+
 </body></html>

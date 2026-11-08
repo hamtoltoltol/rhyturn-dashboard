@@ -1,0 +1,353 @@
+{
+ "_comment": "공간 마스터(facility.json). 호실·침상·면적을 코드에 하드코딩하지 않는다. 확정 필요: 호실별 침상 수, 실면적, 입소자 프로파일, 복도 실측 길이, 2층 실제 호실 번호(assumed:true)",
+ "facility": "GAON",
+ "name": "가온요양원",
+ "zones": [
+  {
+   "id": "A",
+   "floor": "3F",
+   "name": "3층 구관",
+   "assumed": false,
+   "poc": false,
+   "rooms": [
+    "301",
+    "302",
+    "303",
+    "304",
+    "305",
+    "306",
+    "307"
+   ]
+  },
+  {
+   "id": "B",
+   "floor": "3F",
+   "name": "3층 신관",
+   "assumed": false,
+   "poc": true,
+   "rooms": [
+    "308",
+    "309",
+    "310",
+    "311"
+   ]
+  },
+  {
+   "id": "C",
+   "floor": "2F",
+   "name": "2층 구관",
+   "assumed": true,
+   "poc": false,
+   "rooms": [
+    "201",
+    "202",
+    "203",
+    "204",
+    "205",
+    "206",
+    "207"
+   ]
+  },
+  {
+   "id": "D",
+   "floor": "2F",
+   "name": "2층 신관",
+   "assumed": true,
+   "poc": false,
+   "rooms": [
+    "208",
+    "209",
+    "210",
+    "211"
+   ]
+  }
+ ],
+ "rooms": [
+  {
+   "id": "301",
+   "name": "301호",
+   "floor": "3F",
+   "zone": "A",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-A-R301-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "302",
+   "name": "302호",
+   "floor": "3F",
+   "zone": "A",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-A-R302-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "303",
+   "name": "303호",
+   "floor": "3F",
+   "zone": "A",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-A-R303-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "304",
+   "name": "304호",
+   "floor": "3F",
+   "zone": "A",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-A-R304-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "305",
+   "name": "305호",
+   "floor": "3F",
+   "zone": "A",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-A-R305-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "306",
+   "name": "306호",
+   "floor": "3F",
+   "zone": "A",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-A-R306-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "307",
+   "name": "307호",
+   "floor": "3F",
+   "zone": "A",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-A-R307-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "308",
+   "name": "308호",
+   "floor": "3F",
+   "zone": "B",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-B-R308-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "309",
+   "name": "309호",
+   "floor": "3F",
+   "zone": "B",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-B-R309-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "310",
+   "name": "310호",
+   "floor": "3F",
+   "zone": "B",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-B-R310-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "311",
+   "name": "311호",
+   "floor": "3F",
+   "zone": "B",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-3F-B-R311-U01"
+   ],
+   "assumed": false
+  },
+  {
+   "id": "201",
+   "name": "201호",
+   "floor": "2F",
+   "zone": "C",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-C-R201-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "202",
+   "name": "202호",
+   "floor": "2F",
+   "zone": "C",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-C-R202-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "203",
+   "name": "203호",
+   "floor": "2F",
+   "zone": "C",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-C-R203-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "204",
+   "name": "204호",
+   "floor": "2F",
+   "zone": "C",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-C-R204-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "205",
+   "name": "205호",
+   "floor": "2F",
+   "zone": "C",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-C-R205-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "206",
+   "name": "206호",
+   "floor": "2F",
+   "zone": "C",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-C-R206-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "207",
+   "name": "207호",
+   "floor": "2F",
+   "zone": "C",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-C-R207-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "208",
+   "name": "208호",
+   "floor": "2F",
+   "zone": "D",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-D-R208-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "209",
+   "name": "209호",
+   "floor": "2F",
+   "zone": "D",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-D-R209-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "210",
+   "name": "210호",
+   "floor": "2F",
+   "zone": "D",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-D-R210-U01"
+   ],
+   "assumed": true
+  },
+  {
+   "id": "211",
+   "name": "211호",
+   "floor": "2F",
+   "zone": "D",
+   "beds": null,
+   "area": null,
+   "profile": null,
+   "units": [
+    "GAON-2F-D-R211-U01"
+   ],
+   "assumed": true
+  }
+ ]
+}
